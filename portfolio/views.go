@@ -9,5 +9,5 @@ import (
 
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
-	view.SimpleTemplateView(w, "portfolio/index.html", nil)
+	view.SimpleTemplateView(w, nil, "portfolio", "index.html" )
 }

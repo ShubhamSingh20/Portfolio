@@ -1,29 +1,30 @@
 package utils
 
 import (
-	"path"
+	"path/filepath"
 	"net/http"
 	"html/template"
 )
 
 
 var (
-	templatePath = path.Join(path.Dir("."), "templates")
+	templatePath = filepath.Join(filepath.Dir("."), "templates")
 )
 
 
 //GetTemplate get the pointer to the template
-func GetTemplate(templateName string) *template.Template {
+func GetTemplate(templateName ...string) *template.Template {
+	fullTemplatePath := append([]string{templatePath}, templateName...)
 
 	return template.Must(template.ParseFiles(
-		path.Join(templatePath, templateName), 
+		filepath.Join(fullTemplatePath...), 
 	))
 
 }
 
 //SimpleTemplateView just renders provided template
-func SimpleTemplateView(w http.ResponseWriter, templateName string, data interface{})  {
-	template := GetTemplate(templateName)
+func SimpleTemplateView(w http.ResponseWriter, data interface{}, templateName ...string)  {
+	template := GetTemplate(templateName...)
 
 	err := template.Execute(w, data)
 

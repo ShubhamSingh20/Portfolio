@@ -9,7 +9,7 @@ import (
 
 
 func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	view.SimpleTemplateView(w, "blog/admin-login.html", nil)
+	view.SimpleTemplateView(w, nil, "blog", "admin_login.html")
 }
 
 func authenticateUser(w http.ResponseWriter, r *http.Request) {
