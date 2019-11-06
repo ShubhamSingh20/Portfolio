@@ -3,8 +3,10 @@ package blog
 import (
 	"net/http"
 	"path"
-	"html/template"
+
 	"fmt"
+
+	view "github.com/ShubhamSingh20/Portfolio/utils"
 )
 
 
@@ -13,16 +15,7 @@ var (
 )
 
 func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	
-	adminLoginTemplate := template.Must(template.ParseFiles(
-		path.Join(templatePath, "admin-login.html"),
-	))
-	err := adminLoginTemplate.Execute(w, nil)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
+	view.SimpleTemplateView(w, path.Join(templatePath, "admin-login.html"), nil)
 	
 }
 

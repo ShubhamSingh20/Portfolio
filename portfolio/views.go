@@ -2,9 +2,10 @@ package portfolio
 
 import (
 	"net/http"
-	"html/template"
 	"path"
-	//"fmt"
+
+ 	view "github.com/ShubhamSingh20/Portfolio/utils"
+
 )
 
 var (
@@ -13,14 +14,5 @@ var (
 
 //HomePageHandler handles the request for homepage of portfolio
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
-	portfolioTemplate := template.Must(template.ParseFiles(
-		path.Join(templatePath, "index.html"),
-	))
-
-	err := portfolioTemplate.Execute(w, nil)
-	
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
+	view.SimpleTemplateView(w, path.Join(templatePath, "index.html"), nil)
 }
