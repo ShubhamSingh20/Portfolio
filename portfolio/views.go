@@ -14,5 +14,5 @@ var (
 
 //HomePageHandler handles the request for homepage of portfolio
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
-	view.SimpleTemplateView(w, path.Join(templatePath, "index.html"), nil)
+	view.SimpleTemplateView(w, "portfolio/index.html", nil)
 }

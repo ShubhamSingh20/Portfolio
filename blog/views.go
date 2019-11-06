@@ -2,20 +2,14 @@ package blog
 
 import (
 	"net/http"
-	"path"
-
 	"fmt"
 
 	view "github.com/ShubhamSingh20/Portfolio/utils"
 )
 
 
-var (
-	templatePath = path.Join("blog", "templates")
-)
-
 func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	view.SimpleTemplateView(w, path.Join(templatePath, "admin-login.html"), nil)
+	view.SimpleTemplateView(w, "blog/admin-login.html", nil)
 	
 }
 
