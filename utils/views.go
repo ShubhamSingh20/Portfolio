@@ -11,12 +11,19 @@ var (
 	templatePath = path.Join(path.Dir("."), "templates")
 )
 
-//SimpleTemplateView just renders provided template
-func SimpleTemplateView(w http.ResponseWriter, templateName string, data interface{})  {
 
-	template := template.Must(template.ParseFiles(
+//GetTemplate get the pointer to the template
+func GetTemplate(templateName string) *template.Template {
+
+	return template.Must(template.ParseFiles(
 		path.Join(templatePath, templateName), 
 	))
+
+}
+
+//SimpleTemplateView just renders provided template
+func SimpleTemplateView(w http.ResponseWriter, templateName string, data interface{})  {
+	template := GetTemplate(templateName)
 
 	err := template.Execute(w, data)
 

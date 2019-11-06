@@ -10,5 +10,5 @@ const (
 
 func init() {
 	mux := router.Router
-	mux.HandleFunc("/", HomePageHandler).Methods("GET")
+	mux.HandleFunc("/", homePageHandler).Methods("GET")
 }
