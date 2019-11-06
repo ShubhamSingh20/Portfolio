@@ -45,6 +45,7 @@ func executeFromCommandLine() {
 		break
 	
 	case "cleardb":
+		cleardb()
 		break
 	
 	case "cleartb":
@@ -66,6 +67,65 @@ func executeFromCommandLine() {
 }
 
 func main() {
-
 	executeFromCommandLine()
+}
+
+func cleardb() {
+	dbConnection := db.ConnectDb()
+	dbInst := dbConnection.Getdb()
+
+	dbName := dbConnection.GetdbName()
+
+	tableList, err := dbInst.Query(
+		"select table_name FROM information_schema.tables where table_schema=?",
+		dbName,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+		panic(err.Error())
+	}
+
+	var tableNameList []string
+
+	fmt.Println("[*] Following tables will be deleted ...")
+
+	for tableList.Next() {
+		var tableName string
+
+		err = tableList.Scan(&tableName)
+
+        if err != nil {
+            panic(err.Error())
+		}
+		
+		tableNameList = append(tableNameList, tableName)
+		fmt.Println(tableName)
+	}
+
+	var sure string
+
+	fmt.Println("[?] Are you sure ... (y/n)")
+	fmt.Scanf("%s", &sure)
+
+	switch sure {
+	case "Y", "y", "Yes", "yes", "YES":
+		break
+
+	default:
+		return 
+	}
+
+	for _, tableName := range tableNameList {
+		dropStatement, err := dbInst.Prepare("DROP TABLE IF EXISTS " + tableName)
+
+		if err != nil {
+            panic(err.Error())
+		}
+
+		dropStatement.Exec()
+		fmt.Println("[+] ",tableName," deleted.")
+	}
+
+	defer dbInst.Close()
 }
