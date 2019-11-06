@@ -10,7 +10,6 @@ import (
 
 func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	view.SimpleTemplateView(w, "blog/admin-login.html", nil)
-	
 }
 
 func authenticateUser(w http.ResponseWriter, r *http.Request) {
@@ -52,8 +51,3 @@ func deletePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-
-/*
-CREATE USER 'shubham'@'localhost' IDENTIFIED BY '#include';
-GRANT ALL PRIVILEGES ON * . * TO 'shubham'@'localhost';
-*/
