@@ -54,11 +54,25 @@ func executeFromCommandLine() {
 			dbConnection.Migrate(schema...)
 		}
 
-		fmt.Println("[+] It seems that the datbase has been updated successfully.")
+		fmt.Println(
+			"[+] It seems that the datbase has been updated successfully.",
+		)
+
 		defer dbConnection.Getdb().Close()
 		break
 
 	case "createsuperuser":
+		var username, password string
+
+		fmt.Println("Enter following details:")
+		fmt.Printf("|-> Enter username: ")
+		fmt.Scanf("%s", &username)
+
+		fmt.Printf("|->Enter password: ")
+		fmt.Scanf("%s", &password)
+
+		auth.CreateSuperUser(username, password)
+		fmt.Printf("[+] %s created successfully.", username)
 		break
 	
 	case "cleardb":
@@ -77,6 +91,8 @@ func executeFromCommandLine() {
 		}
 		
 		defer dbConnection.Getdb().Close()
+		fmt.Println("[+] Tables deleted successfully.")
+
 		break
 	
 	case "cleartb":
@@ -95,6 +111,8 @@ func executeFromCommandLine() {
 		}
 		
 		defer dbConnection.Getdb().Close()
+		fmt.Println("[+] Tables emptied successfully.")
+		
 		break
 	
 	case "help", "h":
@@ -112,9 +130,11 @@ func executeFromCommandLine() {
 	}
 }
 
+
 func main() {
 	executeFromCommandLine()
 }
+
 
 func areYouSure(f func()) {
 	var sure string
