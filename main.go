@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	auth "github.com/ShubhamSingh20/Portfolio/auth" 
 	db "github.com/ShubhamSingh20/Portfolio/db"
 	router "github.com/ShubhamSingh20/Portfolio/router"
 	portfolio "github.com/ShubhamSingh20/Portfolio/portfolio"
@@ -16,6 +17,11 @@ import (
 var InstalledApps = [...]string{
 	blog.AppName,
 	portfolio.AppName,	
+}
+
+//AppModelSchema contains the schema of all the models
+var AppModelSchema = [][]string{
+	auth.GetModels(),
 }
 
 func executeFromCommandLine() {
@@ -40,15 +46,55 @@ func executeFromCommandLine() {
 
 		log.Fatal(router.HTTPServer.ListenAndServe())
 		break
+	
+	case "migrate":
+		dbConnection := db.ConnectDb()
+
+		for _, schema := range AppModelSchema {
+			dbConnection.Migrate(schema...)
+		}
+
+		fmt.Println("[+] It seems that the datbase has been updated successfully.")
+		defer dbConnection.Getdb().Close()
+		break
 
 	case "createsuperuser":
 		break
 	
 	case "cleardb":
-		cleardb()
+		dbConnection := db.ConnectDb()
+		tableNameList := dbConnection.GetTableListInDb()
+
+		if len(tableNameList) < 1 {
+			fmt.Println("[-] Database is empty")	
+		} else {
+			fmt.Println("[*] Following tables will be deleted ...")
+			for _, tableName := range tableNameList {
+				fmt.Println("-> ", tableName)
+			}
+
+			areYouSure(dbConnection.ClearDb)
+		}
+		
+		defer dbConnection.Getdb().Close()
 		break
 	
 	case "cleartb":
+		dbConnection := db.ConnectDb()
+		tableNameList := dbConnection.GetTableListInDb()
+
+		if len(tableNameList) < 1 {
+			fmt.Println("[-] Database is empty")	
+		} else {
+			fmt.Println("[*] All the rows of following tables will be deleted ...")
+			for _, tableName := range tableNameList {
+				fmt.Println("-> ", tableName)
+			}
+
+			areYouSure(dbConnection.ClearTb)
+		}
+		
+		defer dbConnection.Getdb().Close()
 		break
 	
 	case "help", "h":
@@ -70,39 +116,7 @@ func main() {
 	executeFromCommandLine()
 }
 
-func cleardb() {
-	dbConnection := db.ConnectDb()
-	dbInst := dbConnection.Getdb()
-
-	dbName := dbConnection.GetdbName()
-
-	tableList, err := dbInst.Query(
-		"select table_name FROM information_schema.tables where table_schema=?",
-		dbName,
-	)
-
-	if err != nil {
-		log.Fatal(err)
-		panic(err.Error())
-	}
-
-	var tableNameList []string
-
-	fmt.Println("[*] Following tables will be deleted ...")
-
-	for tableList.Next() {
-		var tableName string
-
-		err = tableList.Scan(&tableName)
-
-        if err != nil {
-            panic(err.Error())
-		}
-		
-		tableNameList = append(tableNameList, tableName)
-		fmt.Println(tableName)
-	}
-
+func areYouSure(f func()) {
 	var sure string
 
 	fmt.Println("[?] Are you sure ... (y/n)")
@@ -110,22 +124,11 @@ func cleardb() {
 
 	switch sure {
 	case "Y", "y", "Yes", "yes", "YES":
+		f()
 		break
 
 	default:
 		return 
 	}
 
-	for _, tableName := range tableNameList {
-		dropStatement, err := dbInst.Prepare("DROP TABLE IF EXISTS " + tableName)
-
-		if err != nil {
-            panic(err.Error())
-		}
-
-		dropStatement.Exec()
-		fmt.Println("[+] ",tableName," deleted.")
-	}
-
-	defer dbInst.Close()
 }
