@@ -87,11 +87,10 @@ func executeFromCommandLine() {
 				fmt.Println("-> ", tableName)
 			}
 
-			areYouSure(dbConnection.ClearDb)
+			areYouSure(dbConnection.ClearDb, "Tables deleted successfully.")
 		}
 		
 		defer dbConnection.Getdb().Close()
-		fmt.Println("[+] Tables deleted successfully.")
 
 		break
 	
@@ -107,11 +106,10 @@ func executeFromCommandLine() {
 				fmt.Println("-> ", tableName)
 			}
 
-			areYouSure(dbConnection.ClearTb)
+			areYouSure(dbConnection.ClearTb, "Tables emptied successfully.")
 		}
 		
 		defer dbConnection.Getdb().Close()
-		fmt.Println("[+] Tables emptied successfully.")
 		
 		break
 	
@@ -136,7 +134,7 @@ func main() {
 }
 
 
-func areYouSure(f func()) {
+func areYouSure(f func(), msg string) {
 	var sure string
 
 	fmt.Println("[?] Are you sure ... (y/n)")
@@ -145,6 +143,7 @@ func areYouSure(f func()) {
 	switch sure {
 	case "Y", "y", "Yes", "yes", "YES":
 		f()
+		fmt.Println("[+] ", msg)
 		break
 
 	default:

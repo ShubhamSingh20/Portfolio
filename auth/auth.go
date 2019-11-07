@@ -2,7 +2,7 @@ package auth
 
 
 import (
-	//"bytes"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +12,7 @@ import (
 
 const saltSize = 16
 
-func generateSalt(secret string) string {
+func generateSalt(secret string) []byte {
 	secretByte := []byte(secret)
 
 	buf := make([]byte, saltSize, saltSize + sha1.Size)
@@ -27,25 +27,32 @@ func generateSalt(secret string) string {
 	hash.Write(buf)
 	hash.Write(secretByte)
 	
-	salt := fmt.Sprintf("%x", hash.Sum(buf))
 	
-	return salt
+	return hash.Sum(buf)
 }
 
 
-func gethashPassword(plainPassword, salt string) string {
+func gethashPassword(plainPassword, salt string) []byte {
 	passwordHash := sha1.New() 
 	combination := salt + plainPassword
 	
 	io.WriteString(passwordHash, combination)
-	hashedPassword := fmt.Sprintf("%x", passwordHash.Sum(nil))
-
-	return hashedPassword
+	return passwordHash.Sum(nil)
 }
 
 func getHashedPasswordAndSalt(plainPassword string) (string, string) {
-	salt := generateSalt(plainPassword)
-	passwordHashString := gethashPassword(plainPassword, salt)
+	salt := fmt.Sprintf("%x", generateSalt(plainPassword))
+	passwordHashString := fmt.Sprintf("%x", gethashPassword(plainPassword, salt)) 
 
 	return passwordHashString, salt
+	
+}
+
+
+func authenticate(inputPassword, correctHashPassword, salt string) bool {
+	inputPasswordHash := gethashPassword(inputPassword, salt)
+	
+	return bytes.Equal(
+		[]byte(correctHashPassword), []byte(fmt.Sprintf("%x",inputPasswordHash)),
+	)
 }

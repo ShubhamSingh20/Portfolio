@@ -35,7 +35,7 @@ func (envDb *EnvDb) GetdbName() string {
 func (envDb *EnvDb) GetTableListInDb() []string {
 	
 	tableList, err := envDb.db.Query(
-		"select table_name FROM information_schema.tables where table_schema=?",
+		"SELECT table_name FROM information_schema.tables WHERE table_schema=?",
 		dbName,
 	)
 
