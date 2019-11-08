@@ -1,21 +1,21 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 
-	auth "github.com/ShubhamSingh20/Portfolio/auth" 
-	server "github.com/ShubhamSingh20/Portfolio/utils/server" 
+	auth "github.com/ShubhamSingh20/Portfolio/auth"
+	blog "github.com/ShubhamSingh20/Portfolio/blog"
 	db "github.com/ShubhamSingh20/Portfolio/db"
 	portfolio "github.com/ShubhamSingh20/Portfolio/portfolio"
-	blog "github.com/ShubhamSingh20/Portfolio/blog"
-
+	server "github.com/ShubhamSingh20/Portfolio/utils/server"
+	cmd "github.com/ShubhamSingh20/Portfolio/utils/command"
 )
 
 //InstalledApps will load all the apps which are being used
 var InstalledApps = [...]string{
 	blog.AppName,
-	portfolio.AppName,	
+	portfolio.AppName,
 }
 
 //AppModelSchema contains the schema of all the models
@@ -32,13 +32,12 @@ func executeFromCommandLine() {
 	}
 
 	programArgument := os.Args[1]
-	
+
 	switch programArgument {
-		
+
 	case "runserver":
 		server.StartServer()
 		break
-		
 
 	case "migrate":
 		dbConnection := db.ConnectDb()
@@ -54,7 +53,6 @@ func executeFromCommandLine() {
 		defer dbConnection.Getdb().Close()
 		break
 
-
 	case "createsuperuser":
 		cred := &auth.Credentials{}
 
@@ -68,83 +66,61 @@ func executeFromCommandLine() {
 		auth.CreateSuperUser(cred)
 		fmt.Printf("[+] %s created successfully.\n", cred.Username)
 		break
-		
 
 	case "cleardb":
 		dbConnection := db.ConnectDb()
 		tableNameList := dbConnection.GetTableListInDb()
 
 		if len(tableNameList) < 1 {
-			fmt.Println("[-] Database is empty")	
+			fmt.Println("[-] Database is empty")
 		} else {
 			fmt.Println("[*] Following tables will be deleted ...")
 			for _, tableName := range tableNameList {
 				fmt.Println("-> ", tableName)
 			}
 
-			areYouSure(dbConnection.ClearDb, "Tables deleted successfully.")
+			cmd.AreYouSure(dbConnection.ClearDb, "Tables deleted successfully.")
 		}
-		
+
 		defer dbConnection.Getdb().Close()
 
 		break
 
-	
 	case "cleartb":
 		dbConnection := db.ConnectDb()
 		tableNameList := dbConnection.GetTableListInDb()
 
 		if len(tableNameList) < 1 {
-			fmt.Println("[-] Database is empty")	
+			fmt.Println("[-] Database is empty")
 		} else {
 			fmt.Println("[*] All the rows of following tables will be deleted ...")
 			for _, tableName := range tableNameList {
 				fmt.Println("-> ", tableName)
 			}
 
-			areYouSure(dbConnection.ClearTb, "Tables emptied successfully.")
+			cmd.AreYouSure(dbConnection.ClearTb, "Tables emptied successfully.")
 		}
-		
+
 		defer dbConnection.Getdb().Close()
-		
+
 		break
-		
-		
+
 	case "help", "h":
 		fmt.Println(
 			"[+] HELP MANUAL \n" +
-			"runserver -- to run development server\n" +
-			"createsuperuser -- to create superuser in db\n" +
-			"cleardb -- clear the database of the program (will delete all the tables) \n" +
-			"cleartb -- clear all the tables in database",
+				"runserver -- to run development server\n" +
+				"createsuperuser -- to create superuser in db\n" +
+				"cleardb -- clear the database of the program (will delete all the tables) \n" +
+				"cleartb -- clear all the tables in database",
 		)
 		break
-	
-	default: 
+
+	default:
 		fmt.Println(programArgument, " no such argument avialable")
 	}
 }
-
 
 func main() {
 	executeFromCommandLine()
 }
 
-
-func areYouSure(f func(), msg string) {
-	var sure string
-
-	fmt.Println("[?] Are you sure ... (y/n)")
-	fmt.Scanf("%s", &sure)
-
-	switch sure {
-	case "Y", "y", "Yes", "yes", "YES":
-		f()
-		fmt.Println("[+] ", msg)
-		break
-
-	default:
-		return 
-	}
-
-}

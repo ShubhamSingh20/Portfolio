@@ -1,18 +1,17 @@
 package db
 
 import (
-	"os"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql" // import for using mysql-db support
 	"log"
+	"os"
 	"time"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql" // import for using mysql-db support
 )
 
 var dbDriver = "mysql"
-var dbUser =  os.Getenv("PORTFOLIO_DB_USER")
-var dbPassWord =  os.Getenv("PORTFOLIO_DB_PASSWORD")
+var dbUser = os.Getenv("PORTFOLIO_DB_USER")
+var dbPassWord = os.Getenv("PORTFOLIO_DB_PASSWORD")
 var dbName = "PortfolioDb"
-
 
 //EnvDb for managing queries regarding statements
 type EnvDb struct {
@@ -24,16 +23,14 @@ func (envDb *EnvDb) Getdb() *sql.DB {
 	return envDb.db
 }
 
-
 //GetdbName get the name of the db
 func (envDb *EnvDb) GetdbName() string {
 	return dbName
 }
 
-
 //GetTableListInDb get list of all the tables in the database
 func (envDb *EnvDb) GetTableListInDb() []string {
-	
+
 	tableList, err := envDb.db.Query(
 		"SELECT table_name FROM information_schema.tables WHERE table_schema=?",
 		dbName,
@@ -51,16 +48,15 @@ func (envDb *EnvDb) GetTableListInDb() []string {
 
 		err = tableList.Scan(&tableName)
 
-        if err != nil {
-            panic(err.Error())
+		if err != nil {
+			panic(err.Error())
 		}
-		
+
 		tableNameList = append(tableNameList, tableName)
 	}
 
 	return tableNameList
 }
-
 
 //ClearDb delete all the tables in the database
 func (envDb *EnvDb) ClearDb() {
@@ -69,7 +65,7 @@ func (envDb *EnvDb) ClearDb() {
 		dropStatement, err := envDb.db.Prepare("DROP TABLE IF EXISTS " + tableName)
 
 		if err != nil {
-            panic(err.Error())
+			panic(err.Error())
 		}
 
 		dropStatement.Exec()
@@ -83,20 +79,18 @@ func (envDb *EnvDb) ClearTb() {
 		deleteStatement, err := envDb.db.Prepare("DELETE FROM " + tableName)
 
 		if err != nil {
-            panic(err.Error())
+			panic(err.Error())
 		}
 
 		deleteStatement.Exec()
 	}
 }
 
-
-
 //Migrate provide models and it will migrate them
-func(envDb *EnvDb) Migrate(tableSchema ...string) {
+func (envDb *EnvDb) Migrate(tableSchema ...string) {
 	for _, schema := range tableSchema {
 		stmt, err := envDb.db.Prepare(schema)
-		
+
 		if err != nil {
 			panic(err.Error())
 		}
@@ -113,21 +107,21 @@ func(envDb *EnvDb) Migrate(tableSchema ...string) {
 // new new connection for each time an db operation is to be done
 func ConnectDb() *EnvDb {
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPassWord+"@/"+dbName)
-	
+
 	if err != nil {
 		log.Fatal(err)
 		panic(err.Error())
 	}
 
-	db.SetConnMaxLifetime(time.Hour/2)
+	db.SetConnMaxLifetime(time.Hour / 2)
 
-	err = db.Ping() ; if err != nil {
+	err = db.Ping()
+	if err != nil {
 		log.Fatal(err)
 		panic(err.Error())
 	}
 
-	
-	envDb := &EnvDb{db:db}
+	envDb := &EnvDb{db: db}
 
-	return  envDb
+	return envDb
 }

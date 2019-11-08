@@ -10,7 +10,6 @@ func Custom404ErrorView(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 //Custom403ErrorView Raise bad request error
 func Custom403ErrorView(w http.ResponseWriter, r *http.Request) {
 	SimpleTemplateView(w, nil, "router", "403_error.html")

@@ -4,24 +4,21 @@ import (
 	db "github.com/ShubhamSingh20/Portfolio/db"
 )
 
-
 //Credentials for passing around user cred
-type Credentials  struct {
+type Credentials struct {
 	Username string
 	Password string
 }
 
-
 var userModel = "" +
 	"CREATE TABLE IF NOT EXISTS `auth_superuser` (" +
-	"`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," + 
+	"`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
 	"`is_logged_in` BOOLEAN DEFAULT FALSE," +
 	"`username` VARCHAR(100) NOT NULL UNIQUE," +
 	"`hashpasswd` VARCHAR(255) DEFAULT NULL," +
 	"`last_logged_in` datetime DEFAULT NULL," +
 	"`salt` VARCHAR(255) DEFAULT NULL" +
-");"
-
+	");"
 
 //AuthenticateUser user validation
 func AuthenticateUser(cred *Credentials) bool {
@@ -44,10 +41,10 @@ func AuthenticateUser(cred *Credentials) bool {
 
 	userValid := authenticate(cred.Password, hashpassword, salt)
 
-	setUserToLoggedIn := func(id int){
+	setUserToLoggedIn := func(id int) {
 		upStmt, err := dbInst.Prepare(
 			"UPDATE `auth_superuser` SET `is_logged_in`=true, `last_logged_in`=now() " +
-			"WHERE `id`=? ;",
+				"WHERE `id`=? ;",
 		)
 
 		if err != nil {
@@ -72,7 +69,7 @@ func CreateSuperUser(cred *Credentials) {
 	dbInst := db.ConnectDb().Getdb()
 	stmt, err := dbInst.Prepare(
 		"INSERT INTO `auth_superuser`(username, hashpasswd, salt) " +
-		"VALUES (?,?,?);",
+			"VALUES (?,?,?);",
 	)
 
 	if err != nil {

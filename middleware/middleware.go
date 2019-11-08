@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
-
 
 //IsUserAuthenticated through a custom 404 page
 var IsUserAuthenticated = func(handlerFunc http.HandlerFunc) http.HandlerFunc {
