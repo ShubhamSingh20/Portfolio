@@ -28,7 +28,13 @@ func authenticateUserHandler(w http.ResponseWriter, r *http.Request) {
 		Password:password,
 	}
 
-	auth.AuthenticateUser(cred)
+	isUserValid  := auth.AuthenticateUser(cred)
+
+	if !isUserValid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	
 
 }
 

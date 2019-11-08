@@ -12,6 +12,9 @@ var Router *mux.Router
 //HTTPServer for listining request
 var HTTPServer *http.Server
 
+//HTTPServerClosed for listining request
+var HTTPServerClosed = http.ErrServerClosed
+
 func init() {
 	Router = mux.NewRouter()
 

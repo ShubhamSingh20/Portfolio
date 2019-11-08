@@ -6,6 +6,7 @@ import (
 	"log"
 
 	auth "github.com/ShubhamSingh20/Portfolio/auth" 
+	util "github.com/ShubhamSingh20/Portfolio/utils" 
 	db "github.com/ShubhamSingh20/Portfolio/db"
 	router "github.com/ShubhamSingh20/Portfolio/router"
 	portfolio "github.com/ShubhamSingh20/Portfolio/portfolio"
@@ -41,10 +42,22 @@ func executeFromCommandLine() {
 		fmt.Println(
 			"[+] Starting development server at ", 
 			router.HTTPServer.Addr,
-			"\nPress Ctrl+C to exit",
 		)
 
-		log.Fatal(router.HTTPServer.ListenAndServe())
+		util.SetupRedisCache()
+		fmt.Println(
+			"[+] Started redis cache " + 
+			"\nPress Ctrl+C to exit",
+		)
+		if err := router.HTTPServer.ListenAndServe(); err != nil && err != router.HTTPServerClosed {
+			log.Fatalf("Could not listen : %v\n", err)
+		}
+
+		fmt.Println("[+] Server Stopped")
+		
+		util.CloseRedisConnection()
+		fmt.Println("[+] Closed Redis Connection")
+
 		break
 		
 
