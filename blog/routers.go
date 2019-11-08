@@ -15,7 +15,7 @@ func init() {
 	mux := router.Router
 
 	mux.HandleFunc("/admin/", adminLoginHandler).Methods("GET")
-	mux.HandleFunc("/admin/", authenticateUser).Methods("POST")
+	mux.HandleFunc("/admin/", authenticateUserHandler).Methods("POST")
 	mux.HandleFunc("/admin-dashboard/", adminDashboardHandler)
 
 	blogRouter := mux.PathPrefix("/blog").Subrouter()

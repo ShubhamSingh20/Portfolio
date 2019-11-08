@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"fmt"
 
+	auth "github.com/ShubhamSingh20/Portfolio/auth"
 	view "github.com/ShubhamSingh20/Portfolio/utils"
 )
 
@@ -12,7 +13,7 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	view.SimpleTemplateView(w, nil, "blog", "admin_login.html")
 }
 
-func authenticateUser(w http.ResponseWriter, r *http.Request) {
+func authenticateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 	if err := r.ParseForm(); err != nil {
 		fmt.Fprintf(w, "ParseForm() err: %v", err)
@@ -22,7 +23,12 @@ func authenticateUser(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	fmt.Println(username, password)
+	cred := &auth.Credentials{
+		Username:username, 
+		Password:password,
+	}
+
+	auth.AuthenticateUser(cred)
 
 }
 

@@ -18,18 +18,21 @@ var userModel = "" +
 	"`is_logged_in` BOOLEAN DEFAULT FALSE," +
 	"`username` VARCHAR(100) NOT NULL UNIQUE," +
 	"`hashpasswd` VARCHAR(255) DEFAULT NULL," +
+	"`last_logged_in` datetime DEFAULT NULL," +
 	"`salt` VARCHAR(255) DEFAULT NULL" +
 ");"
 
 
 //AuthenticateUser user validation
 func AuthenticateUser(cred *Credentials) bool {
+	var id int
 	var hashpassword, salt string
 
 	dbInst := db.ConnectDb().Getdb()
+	defer dbInst.Close()
 
 	stmt, err := dbInst.Query(
-		"SELECT `hashpasswd`, `salt` FROM `auth_superuser` WHERE `username`= ? ;",
+		"SELECT `id`, `hashpasswd`, `salt` FROM `auth_superuser` WHERE `username`= ? ;",
 		cred.Username,
 	)
 
@@ -37,12 +40,28 @@ func AuthenticateUser(cred *Credentials) bool {
 		panic(err.Error())
 	}
 
-	stmt.Scan(&hashpassword, &salt)
-	
-	defer dbInst.Close()
+	stmt.Scan(&id, &hashpassword, &salt)
 
-	return authenticate(cred.Password, hashpassword, salt)
+	userValid := authenticate(cred.Password, hashpassword, salt)
 
+	setUserToLoggedIn := func(id int){
+		upStmt, err := dbInst.Prepare(
+			"UPDATE `auth_superuser` SET `is_logged_in`=true, `last_logged_in`=now() " +
+			"WHERE `id`=? ;",
+		)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		upStmt.Exec(id)
+	}
+
+	if userValid {
+		setUserToLoggedIn(id)
+	}
+
+	return userValid
 }
 
 //CreateSuperUser takes in username & password and create superuser.
