@@ -14,7 +14,6 @@ const saltSize = 16
 
 func generateSalt(secret string) []byte {
 	secretByte := []byte(secret)
-
 	buf := make([]byte, saltSize, saltSize + sha1.Size)
 	_, err := io.ReadFull(rand.Reader, buf)
 
@@ -26,8 +25,7 @@ func generateSalt(secret string) []byte {
 	hash := sha1.New()
 	hash.Write(buf)
 	hash.Write(secretByte)
-	
-	
+
 	return hash.Sum(buf)
 }
 
@@ -43,15 +41,14 @@ func gethashPassword(plainPassword, salt string) []byte {
 func getHashedPasswordAndSalt(plainPassword string) (string, string) {
 	salt := fmt.Sprintf("%x", generateSalt(plainPassword))
 	passwordHashString := fmt.Sprintf("%x", gethashPassword(plainPassword, salt)) 
-
-	return passwordHashString, salt
 	
+	return passwordHashString, salt
 }
 
 
 func authenticate(inputPassword, correctHashPassword, salt string) bool {
 	inputPasswordHash := gethashPassword(inputPassword, salt)
-	
+
 	return bytes.Equal(
 		[]byte(correctHashPassword), []byte(fmt.Sprintf("%x",inputPasswordHash)),
 	)

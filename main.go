@@ -46,7 +46,8 @@ func executeFromCommandLine() {
 
 		log.Fatal(router.HTTPServer.ListenAndServe())
 		break
-	
+		
+
 	case "migrate":
 		dbConnection := db.ConnectDb()
 
@@ -61,20 +62,22 @@ func executeFromCommandLine() {
 		defer dbConnection.Getdb().Close()
 		break
 
+
 	case "createsuperuser":
-		var username, password string
+		cred := &auth.Credentials{}
 
 		fmt.Println("Enter following details:")
 		fmt.Printf("|-> Enter username: ")
-		fmt.Scanf("%s", &username)
+		fmt.Scanf("%s", &cred.Username)
 
 		fmt.Printf("|->Enter password: ")
-		fmt.Scanf("%s", &password)
+		fmt.Scanf("%s", &cred.Password)
 
-		auth.CreateSuperUser(username, password)
-		fmt.Printf("[+] %s created successfully.", username)
+		auth.CreateSuperUser(cred)
+		fmt.Printf("[+] %s created successfully.\n", cred.Username)
 		break
-	
+		
+
 	case "cleardb":
 		dbConnection := db.ConnectDb()
 		tableNameList := dbConnection.GetTableListInDb()
@@ -93,6 +96,7 @@ func executeFromCommandLine() {
 		defer dbConnection.Getdb().Close()
 
 		break
+
 	
 	case "cleartb":
 		dbConnection := db.ConnectDb()
@@ -112,7 +116,8 @@ func executeFromCommandLine() {
 		defer dbConnection.Getdb().Close()
 		
 		break
-	
+		
+		
 	case "help", "h":
 		fmt.Println(
 			"[+] HELP MANUAL \n" +

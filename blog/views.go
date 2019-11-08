@@ -18,7 +18,7 @@ func authenticateUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "ParseForm() err: %v", err)
 		return
 	}
-	
+
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 

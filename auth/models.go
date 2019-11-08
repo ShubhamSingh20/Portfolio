@@ -5,6 +5,13 @@ import (
 )
 
 
+//Credentials for passing around user cred
+type Credentials  struct {
+	Username string
+	Password string
+}
+
+
 var userModel = "" +
 	"CREATE TABLE IF NOT EXISTS `auth_superuser` (" +
 	"`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY," + 
@@ -16,34 +23,32 @@ var userModel = "" +
 
 
 //AuthenticateUser user validation
-func AuthenticateUser(username, inputPassword string) bool {
+func AuthenticateUser(cred *Credentials) bool {
 	var hashpassword, salt string
 
 	dbInst := db.ConnectDb().Getdb()
 
 	stmt, err := dbInst.Query(
 		"SELECT `hashpasswd`, `salt` FROM `auth_superuser` WHERE `username`= ? ;",
-		username,
+		cred.Username,
 	)
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	for stmt.Next() {
-		stmt.Scan(&hashpassword, &salt)
-	}
-
+	stmt.Scan(&hashpassword, &salt)
+	
 	defer dbInst.Close()
 
-	return authenticate(inputPassword, hashpassword, salt)
+	return authenticate(cred.Password, hashpassword, salt)
 
 }
 
 //CreateSuperUser takes in username & password and create superuser.
-func CreateSuperUser(username, password string) {
+func CreateSuperUser(cred *Credentials) {
 
-	password, salt := getHashedPasswordAndSalt(password)
+	passwordHashed, salt := getHashedPasswordAndSalt(cred.Password)
 
 	dbInst := db.ConnectDb().Getdb()
 	stmt, err := dbInst.Prepare(
@@ -55,7 +60,7 @@ func CreateSuperUser(username, password string) {
 		panic(err.Error())
 	}
 
-	stmt.Exec(username, password, salt)
+	stmt.Exec(cred.Username, passwordHashed, salt)
 
 	defer dbInst.Close()
 
