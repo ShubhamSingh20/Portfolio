@@ -1,4 +1,5 @@
-package utils
+package server
+
 
 import (
 	"github.com/gomodule/redigo/redis"

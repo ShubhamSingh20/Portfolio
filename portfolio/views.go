@@ -2,7 +2,7 @@ package portfolio
 
 import (
 	"net/http"
- 	view "github.com/ShubhamSingh20/Portfolio/utils"
+ 	view "github.com/ShubhamSingh20/Portfolio/utils/view"
 
 )
 

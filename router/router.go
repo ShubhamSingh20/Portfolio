@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 	mux "github.com/gorilla/mux"
+	errView "github.com/ShubhamSingh20/Portfolio/utils/view"
 )
 
 //Router global variable
@@ -18,8 +19,8 @@ var HTTPServerClosed = http.ErrServerClosed
 func init() {
 	Router = mux.NewRouter()
 
-	Router.NotFoundHandler = http.HandlerFunc(Custom404ErrorView)
-	Router.MethodNotAllowedHandler = http.HandlerFunc(Custom403ErrorView)
+	Router.NotFoundHandler = http.HandlerFunc(errView.Custom404ErrorView)
+	Router.MethodNotAllowedHandler = http.HandlerFunc(errView.Custom403ErrorView)
 	
 	Router.PathPrefix("/static/").
 		Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

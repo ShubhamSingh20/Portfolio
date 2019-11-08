@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	auth "github.com/ShubhamSingh20/Portfolio/auth"
-	view "github.com/ShubhamSingh20/Portfolio/utils"
+	view "github.com/ShubhamSingh20/Portfolio/utils/view"
 )
 
 
